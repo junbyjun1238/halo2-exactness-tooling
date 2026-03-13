@@ -1,0 +1,19 @@
+[package]
+name = "halo2-exactness-tooling"
+version = "0.1.0"
+edition = "2021"
+description = "Halo2-facing verification and benchmark tooling for BN254 deferred-quotient exactness repair"
+license = "MIT"
+repository = "https://github.com/junbyjun1238/halo2-exactness-tooling"
+homepage = "https://ethresear.ch/t/when-l-d-pq-is-not-enough-exactness-repair-for-bn254-wrappers/24313"
+
+[dependencies]
+# PSE halo2_proofs fork (Zcash/Halo2 ecosystem compatibility path)
+halo2_proofs = { git = "https://github.com/privacy-scaling-explorations/halo2.git", tag = "v0.3.0" }
+# External de-facto standard gadget stack (PSE halo2wrong / maingate)
+maingate = { git = "https://github.com/privacy-scaling-explorations/halo2wrong.git", package = "maingate", rev = "3eaa2c4703a333e9695dc980bebf3445b7a9b141" }
+rand_core = "0.6"
+
+[dev-dependencies]
+# Benchmark/measurement tooling for later A/B runs
+criterion = "0.5"

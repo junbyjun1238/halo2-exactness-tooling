@@ -1,0 +1,78 @@
+# Minimal Halo2 Integration Example
+
+This package is still primarily a benchmark and verification artifact, but it now
+includes a small Halo2-facing integration surface that a third party can invoke
+without going through the benchmark runners.
+
+## What is included
+
+- public helper API in `src/integration.rs`
+- runnable example at `examples/halo2_integration_demo.rs`
+- reusable constructors:
+  - `build_a_secure_circuit(...)`
+  - `build_b_note_circuit(...)`
+- simple verification helpers:
+  - `verify_a_secure_mock(...)`
+  - `verify_b_note_mock(...)`
+  - `verify_mock(...)`
+- real prove/verify helpers using the same public proof path as the benchmark bins:
+  - `prove_and_verify_a_secure_real(...)`
+  - `prove_and_verify_b_note_real(...)`
+- public metadata for the current contract:
+  - recommended `k`
+  - per-repetition row count
+  - logical lookup / multiplicative / linear counts
+
+## Why this exists
+
+The benchmark package already contained real Halo2 circuits, but it was shaped as
+an artifact/reproduction bundle. This example is the minimal proof that the
+released `B_note` path can be consumed as a Halo2-facing library surface rather
+than only as a benchmark runner.
+
+This is still **not** a full external codebase integration. It is a minimal
+reference integration path inside the released package, but it now exposes both
+MockProver checks and a real `create_proof` / `verify_proof` library path.
+
+## Run the example
+
+```bash
+cargo run --example halo2_integration_demo
+```
+
+This example now runs a real `create_proof` / `verify_proof` cycle at
+`k_run = 17`, so it is expected to take noticeably longer than a pure
+`MockProver` smoke check.
+
+Expected output includes:
+
+- the recommended `k` for the `B_note` example path,
+- the current per-repetition row and logical-count metadata,
+- a successful `MockProver` verification on the `boundary` profile.
+- a successful real prove/verify cycle with proof metrics from the public
+  Halo2 proof path.
+
+## Example downstream usage
+
+```rust
+ use halo2_exactness_tooling::integration::{
+     build_b_note_circuit, prove_and_verify_b_note_real, verify_b_note_mock,
+ };
+ use halo2_exactness_tooling::shared_inputs::InputProfile;
+ 
+ let circuit = build_b_note_circuit(1, InputProfile::Boundary);
+ verify_b_note_mock(1, InputProfile::Boundary).unwrap();
+ let metrics = prove_and_verify_b_note_real(1, InputProfile::Boundary, Some(17)).unwrap();
+```
+
+## Claim boundary
+
+This example only demonstrates a minimal Halo2-facing integration path for the
+released `B_note` circuit surface.
+
+It does **not** by itself establish:
+
+- backend closure,
+- full wrapper-level parity,
+- PCS / Fiat-Shamir soundness,
+- integration against an external third-party codebase.
