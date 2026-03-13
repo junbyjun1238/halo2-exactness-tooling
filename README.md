@@ -22,8 +22,11 @@ artifact history remain in the companion repository:
 If you want the library-facing tooling surface, begin with:
 
 - `src/integration.rs`
+- `src/halo2wrong_adapter.rs`
 - `examples/halo2_integration_demo.rs`
+- `examples/halo2wrong_adapter_demo.rs`
 - `docs/halo2_integration_example.md`
+- `docs/halo2wrong_adapter_example.md`
 
 If you want the rerun and verification harness:
 
@@ -50,9 +53,20 @@ cargo run --example halo2_integration_demo --quiet
 The demo performs both a `MockProver` check and a real proof/verification
 cycle, so it is intentionally slower than a pure smoke test.
 
+Run the `halo2wrong` / `maingate`-style adapter demo:
+
+```bash
+cargo run --example halo2wrong_adapter_demo --quiet
+```
+
+This second demo shows that the standalone tooling surface now supports a
+consumer-shaped `halo2wrong`-style path through the public crate API rather
+than only through benchmark binaries.
+
 ## What This Repo Does
 
 - exposes a minimal but real Halo2-facing integration path,
+- exposes a minimal `halo2wrong` / `maingate`-style adapter path,
 - keeps the public proof path reachable from library code,
 - provides repeat/sweep runners for defended A/B comparisons,
 - packages checker inputs and parity-facing status notes next to the code.

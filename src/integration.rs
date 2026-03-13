@@ -100,10 +100,7 @@ pub fn build_b_note_circuit(
     BaselineBNoteCircuit::with_profile(repetitions, input_profile)
 }
 
-pub fn verify_a_secure_mock(
-    repetitions: usize,
-    input_profile: InputProfile,
-) -> Result<(), String> {
+pub fn verify_a_secure_mock(repetitions: usize, input_profile: InputProfile) -> Result<(), String> {
     let circuit = build_a_secure_circuit(repetitions, input_profile);
     let prover = MockProver::run(A_SECURE_RECOMMENDED_K as u32, &circuit, vec![])
         .map_err(|err| format!("MockProver construction failed: {err:?}"))?;
@@ -112,10 +109,7 @@ pub fn verify_a_secure_mock(
         .map_err(|failures| format!("Verification failed: {failures:?}"))
 }
 
-pub fn verify_b_note_mock(
-    repetitions: usize,
-    input_profile: InputProfile,
-) -> Result<(), String> {
+pub fn verify_b_note_mock(repetitions: usize, input_profile: InputProfile) -> Result<(), String> {
     let circuit = build_b_note_circuit(repetitions, input_profile);
     let prover = MockProver::run(B_NOTE_RECOMMENDED_K as u32, &circuit, vec![])
         .map_err(|err| format!("MockProver construction failed: {err:?}"))?;
@@ -135,7 +129,11 @@ pub fn verify_mock(
     }
 }
 
-fn prove_and_verify_real<C>(circuit: C, k_run: u32) -> Result<RealProofMetrics, String>
+pub fn prove_and_verify_real_circuit_with_instances<C>(
+    circuit: C,
+    k_run: u32,
+    instances: &[&[&[IntegrationField]]],
+) -> Result<RealProofMetrics, String>
 where
     C: Circuit<IntegrationField> + Clone,
 {
@@ -155,7 +153,7 @@ where
         &params,
         &pk,
         &[circuit],
-        &[&[]],
+        instances,
         OsRng,
         &mut transcript,
     )
@@ -170,7 +168,7 @@ where
         &params,
         pk.get_vk(),
         strategy,
-        &[&[]],
+        instances,
         &mut verify_transcript,
     )
     .map_err(|e| format!("verify_proof failed: {e:?}"))?;
@@ -186,13 +184,20 @@ where
     })
 }
 
+pub fn prove_and_verify_real_circuit<C>(circuit: C, k_run: u32) -> Result<RealProofMetrics, String>
+where
+    C: Circuit<IntegrationField> + Clone,
+{
+    prove_and_verify_real_circuit_with_instances(circuit, k_run, &[&[]])
+}
+
 pub fn prove_and_verify_a_secure_real(
     repetitions: usize,
     input_profile: InputProfile,
     k_run: Option<u32>,
 ) -> Result<RealProofMetrics, String> {
     let circuit = build_a_secure_circuit(repetitions, input_profile);
-    prove_and_verify_real(circuit, k_run.unwrap_or(A_SECURE_RECOMMENDED_K as u32))
+    prove_and_verify_real_circuit(circuit, k_run.unwrap_or(A_SECURE_RECOMMENDED_K as u32))
 }
 
 pub fn prove_and_verify_b_note_real(
@@ -201,7 +206,7 @@ pub fn prove_and_verify_b_note_real(
     k_run: Option<u32>,
 ) -> Result<RealProofMetrics, String> {
     let circuit = build_b_note_circuit(repetitions, input_profile);
-    prove_and_verify_real(circuit, k_run.unwrap_or(B_NOTE_RECOMMENDED_K as u32))
+    prove_and_verify_real_circuit(circuit, k_run.unwrap_or(B_NOTE_RECOMMENDED_K as u32))
 }
 
 #[cfg(test)]

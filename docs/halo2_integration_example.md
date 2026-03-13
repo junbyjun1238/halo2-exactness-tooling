@@ -16,6 +16,8 @@ without going through the benchmark runners.
   - `verify_b_note_mock(...)`
   - `verify_mock(...)`
 - real prove/verify helpers using the same public proof path as the benchmark bins:
+  - `prove_and_verify_real_circuit_with_instances(...)`
+  - `prove_and_verify_real_circuit(...)`
   - `prove_and_verify_a_secure_real(...)`
   - `prove_and_verify_b_note_real(...)`
 - public metadata for the current contract:
@@ -33,6 +35,9 @@ than only as a benchmark runner.
 This is still **not** a full external codebase integration. It is a minimal
 reference integration path inside the released package, but it now exposes both
 MockProver checks and a real `create_proof` / `verify_proof` library path.
+
+For the more consumer-shaped `maingate` / `halo2wrong` adapter path, see
+`docs/halo2wrong_adapter_example.md`.
 
 ## Run the example
 
